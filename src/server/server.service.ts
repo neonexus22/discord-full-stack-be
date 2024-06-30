@@ -57,6 +57,15 @@ export class ServerService {
           },
         },
       },
+      include: {
+        members: {
+          include: {
+            profile: true,
+            server: true,
+          },
+        },
+        channels: true,
+      },
     });
     if (!server) throw new BadRequestException('Server not found');
     return server;

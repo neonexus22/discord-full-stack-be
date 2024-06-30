@@ -11,17 +11,13 @@ import { join } from 'path';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { CreateServerDto } from './dto';
 import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-import { log } from 'console';
 @UseGuards(GraphqlAuthGuard)
 @Resolver()
 export class ServerResolver {
   constructor(private readonly serverService: ServerService) {}
 
   @Query(() => [Server])
-  async getServers(
-    @Args('profileId') profileId: number,
-    @Context() ctx: { req: Request },
-  ) {
+  async getServers(@Context() ctx: { req: Request }) {
     const { email } = ctx.req?.profile;
     if (!email) {
       return new ApolloError('Profile not found', 'PROFILE_NOT_FOUND');
@@ -35,10 +31,21 @@ export class ServerResolver {
     @Args('file', { type: () => GraphQlUpload, nullable: true })
     file: GraphQlUpload,
   ) {
-    log('server', { input });
-    let imageUrl: string;
-    if (file) imageUrl = await this.storeImageAndGetUrl(file);
+    if (!file) throw new ApolloError('Image is required', 'IMAGE_REQUIRED');
+    const imageUrl = await this.storeImageAndGetUrl(file);
     return this.serverService.createServer(input, imageUrl);
+  }
+
+  @Query(() => Server)
+  async getServer(
+    @Context() ctx: { req: Request },
+    @Args('id', { nullable: true }) id: number,
+  ) {
+    const { email } = ctx?.req?.profile;
+    if (!email) {
+      return new ApolloError('Profile not found', 'PROFILE_NOT_FOUND');
+    }
+    return this.serverService.getServer(id, email);
   }
 
   async storeImageAndGetUrl(file: GraphQLUpload) {

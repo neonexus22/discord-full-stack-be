@@ -57,6 +57,6 @@ export class Server {
   @Field(() => [Member], { nullable: true })
   members: Member[];
 
-  @Field(() => [Channel])
+  @Field(() => [Channel], { nullable: true })
   channels: Channel[];
 }

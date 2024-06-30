@@ -65,11 +65,12 @@ type Profile {
 
 type Query {
   getProfileById(profileId: Float!): Profile!
-  getServers(profileId: Float!): [Server!]!
+  getServer(id: Float): Server!
+  getServers: [Server!]!
 }
 
 type Server {
-  channels: [Channel!]!
+  channels: [Channel!]
   id: Float!
   imageUrl: String!
   inviteCode: String
